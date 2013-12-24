@@ -46,7 +46,7 @@ Run setup.sh to add the package to the python path and add an alias for lookat.
 
 Configuration
 -------------
-If you add a file lookat_helpers.py at a place where python can find it (i.e. in 
+If you add a file lookat_helper.py at a place where python can find it (i.e. in 
 PYTHONPATH), lookat will import all names from the file. This is useful to define 
 frequently used variables like standard selections.
 
