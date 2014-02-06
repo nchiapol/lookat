@@ -824,6 +824,22 @@ def save_objects(filename, objects=None, option="recreate"):
         h.Write()
     outfile.Close()
 
+def lstree(on_file = None):
+    """ print full directory tree of a file
+
+    prints the content of the file and all its directories
+
+    Parameters
+    ----------
+    on_file : TFile
+        file to process (default: gFiles[-1])
+
+    """
+    if on_file == None:
+        on_file = gFiles[-1]
+    on_file.ReadAll("dirs*")
+    on_file.ls()
+
 def exit_handler():
     """ prevent segfault from ROOT when deleting pads """
     cleanup()
@@ -843,4 +859,4 @@ if __name__ == "__main__":
         add_file( sys.argv[1] )
 
         print("use:\n  load( '<tree>' )\nto load a tree.\n")
-        gFiles[-1].ls()
+        lstree()
