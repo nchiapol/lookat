@@ -773,6 +773,32 @@ def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
     h.Draw(do)
     return h
 
+def create_weight_string(histo):
+    """ create a weight string based on passed histogram
+
+    creates a string that can be used in TTree.Draw() to weight the events
+    according to the content of the passed histogram.
+
+    Parameters
+    ----------
+    histo : TH1F
+        histogram to take weights from
+
+    Returns
+    -------
+    output : string
+        string for use as weight in TTree.Draw()
+
+    """
+    output = "("
+    tmpl_str = "{weight:.3f}*({low:.2f} < {var} && {var} < {high:.2f})+"
+    for i in range(1, histo.GetNbinsX()+1):
+        output += tmpl_str.format(weight=histo.GetBinContent(i),
+                                  low=histo.GetBinLowEdge(i),
+                                  high=histo.GetBinLowEdge(i+1),
+                                  var=histo.var_info)
+    return output[:-1]+")"
+
 def save_objects(filename, objects=None, option="recreate"):
     """ save a set of root objects into a file
 
