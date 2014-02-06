@@ -15,7 +15,7 @@ Several global lists provide access to previously created objects.
 """
 
 import atexit
-from canvashandler import CanvasHandler
+from lookat.canvashandler import CanvasHandler
 from ROOT import TFile, TChain, TTree
 from ROOT import TH1F, TH2F
 from ROOT import gDirectory
@@ -804,7 +804,7 @@ atexit.register(exit_handler)
 
 if __name__ == "__main__":
     import sys
-    if (len(sys.argv) != 2):
+    if len(sys.argv) != 2:
         print("\nmissing command-line argument, no file loaded!")
         print("use:\n  add_file( '<file>')\n  load( '<tree>' )")
         print("or:\n  create_chain( '<name>', [<files>] )\nto get started.")
