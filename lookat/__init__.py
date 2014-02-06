@@ -90,11 +90,11 @@ class RatioTHnF(object):
         self._ratio = self._num.Clone()
         self._ratio.SetName(res_name)
         try:
-            self._var_info = self._num.var_info
+            self._ratio.var_info = self._num.var_info
         except AttributeError:
             print "Warning: numerator histogram has no var_info attribute"
             print "         use set_varinfo('var') to set manually."
-            self._var_info = None
+            self._ratio.var_info = None
         if type(self._ratio) == TH2F:
             self.get_content = self._get_content_2d
         else:
@@ -112,7 +112,7 @@ class RatioTHnF(object):
         """ get var_info (variable filled) for this histogram
 
         """
-        return self._var_info
+        return self._ratio.var_info
 
     def set_varinfo(self, varinfo):
         """ set var_info
@@ -120,7 +120,7 @@ class RatioTHnF(object):
         var_info should contain the string used to TTree.Draw() the histogram.
 
         """
-        self._var_info = varinfo
+        self._ratio.var_info = varinfo
 
     def __repr__(self):
         """ get informativ string representation """
@@ -228,6 +228,11 @@ class RatioTHnF(object):
         return edges
 
     get_content_docstring = """
+    @property
+    def get_ratio_thnf(self):
+        """ get the TH1F/TH2F object for the ratio """
+        return self._ratio
+
     Parameters
     ----------
     evt : TTree event
@@ -248,7 +253,7 @@ class RatioTHnF(object):
 
         """
         return self._ratio.GetBinContent(
-                   self._ratio.FindFixBin( evt.__getattr__(self._var_info) )
+                   self._ratio.FindFixBin( evt.__getattr__(self.var_info) )
                )
 
     def _get_content_2d(self, evt):
@@ -257,7 +262,7 @@ class RatioTHnF(object):
         helper function for 2d histograms
 
         """
-        var_y, var_x = self._var_info.split(':')
+        var_y, var_x = self.var_info.split(':')
         return self._ratio.GetBinContent(  self._ratio.FindFixBin(
                     evt.__getattr__(var_x),
                     evt.__getattr__(var_y),
@@ -756,7 +761,6 @@ def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
     put_texts(xlabel=var)
     for evt in tree.CopyTree(select):
         try:
-
             h.Fill(evt.__getattr__(var), 1./h_eff.get_content(evt) )
         except ZeroDivisionError:
             print "Warning: event with 0 efficiency, skipping!"
