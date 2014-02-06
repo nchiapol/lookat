@@ -227,12 +227,12 @@ class RatioTHnF(object):
         edges.append(edges[-1]+self._ratio.GetBinWidth(n_bins))
         return edges
 
-    get_content_docstring = """
     @property
     def get_ratio_thnf(self):
         """ get the TH1F/TH2F object for the ratio """
         return self._ratio
 
+    _get_content_docstring = """
     Parameters
     ----------
     evt : TTree event
@@ -269,8 +269,8 @@ class RatioTHnF(object):
                ) )
 
     #pylint: disable-msg=E1101
-    _get_content_1d.__doc__ += get_content_docstring
-    _get_content_2d.__doc__ += get_content_docstring
+    _get_content_1d.__doc__ += _get_content_docstring
+    _get_content_2d.__doc__ += _get_content_docstring
     #pylint: enable-msg=E1101
 
 
