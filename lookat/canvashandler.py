@@ -10,9 +10,52 @@ License: GNU General Public License version 2,
 
 """
 from ROOT import TCanvas, TPad, TPaveText, TLegend
-from ROOT import TH1F, TH2F
+from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphAsymmErrors
 
 em = 0.035
+
+class TextStrategyDefault(object):
+    def __init__(self, obj):
+        if type(obj) not in [TH1F, TH2F, TGraph, TGraphAsymmErrors]:
+            raise TypeError("bad type passed")
+        self._obj = obj
+        self._x   = obj.GetXaxis()
+        self._y   = obj.GetYaxis()
+
+    def set_title(self, title):
+        """ update the title """
+        self._obj.SetTitle(title)
+
+    def set_xlabel(self, xlabel, size):
+        """ update the label on the x-axis """
+        self._x.SetTitle(xlabel)
+        self._x.SetTitleSize( size )
+
+    def set_ylabel(self, ylabel, size):
+        """ update the label on the y-axis """
+        self._y.SetTitle(ylabel)
+        self._y.SetTitleSize( size )
+
+    def set_axes(self, size, ndiv, offset):
+        """ rescale the axis labels """
+        self._x.SetLabelSize(size)
+        self._y.SetLabelSize(size)
+        self._y.SetNdivisions( ndiv )
+        self._x.SetTitleOffset( offset )
+        self._y.SetTitleOffset( offset )
+
+    def set_yrange(self, y_min, y_max):
+        """ change the axis range """
+        self._y.SetRangeUser(y_min, y_max)
+
+class TextStrategyEfficiency(TextStrategyDefault):
+    def __init__(self, obj):
+        if type(obj) not in [TEfficiency]:
+            raise TypeError("no TEfficiency object passed")
+        self._obj = obj
+        self._x   = obj.GetPaintedGraph().GetXaxis()
+        self._y   = obj.GetPaintedGraph().GetYaxis()
+
 
 class PadHandler(object):
     """ class to manage an indiviual pad
@@ -38,6 +81,7 @@ class PadHandler(object):
         self._title      = ""
         self._xlabel     = ""
         self._ylabel     = ""
+        self._text_strategy = None
 
         self._pad = TPad(name, name, dim[0], dim[1], dim[2], dim[3], 4000)
         self._pad.Draw()
@@ -80,6 +124,21 @@ class PadHandler(object):
         """
         self._pad.SetGrid()
 
+    def set_text_strategy(self):
+        """ set the text strategy
+
+        Raises
+        ------
+        StopIteration error, if no suitable object is found
+
+        """
+        types = [TH1F, TH2F, TEfficiency, TGraph, TGraphAsymmErrors]
+        text_obj = self.get_primitives(types).next()
+        if type(text_obj) == TEfficiency:
+            self._text_strategy = TextStrategyEfficiency(text_obj)
+        else:
+            self._text_strategy = TextStrategyDefault(text_obj)
+
     def Update(self):
         """ Update this pad
 
@@ -87,8 +146,9 @@ class PadHandler(object):
         update funtions.
 
         """
+        self._pad.Update()
         try:
-            self.get_primitives([TH1F, TH2F]).next()
+            self.set_text_strategy()
         except StopIteration:
             self._pad.Update()
             return
@@ -155,10 +215,10 @@ class PadHandler(object):
 
         """
         try:
-            h = self.get_primitives(TH1F).next()
+            self.set_text_strategy()
         except StopIteration:
             return
-        h.GetYaxis().SetRangeUser(y_min, y_max)
+        self._text_strategy.set_yrange(y_min, y_max)
         self._pad.Update()
 
     def set_title(self, title):
@@ -212,8 +272,7 @@ class PadHandler(object):
             font size in units of default font size (em)
 
         """
-        main_h = self.get_primitives([TH1F, TH2F]).next()
-        main_h.SetTitle(self._title)
+        self._text_strategy.set_title(self._title)
         self._pad.Update()
         try:
             text = self.get_primitives(TPaveText).next()
@@ -233,9 +292,7 @@ class PadHandler(object):
             font size in units of default font size (em)
 
         """
-        main_h = self.get_primitives([TH1F, TH2F]).next()
-        main_h.SetXTitle(self._xlabel)
-        main_h.GetXaxis().SetTitleSize( self._calc_size(size)  )
+        self._text_strategy.set_xlabel(self._xlabel, self._calc_size(size) )
 
     def _update_ylabel(self, size=1):
         """ update the label on the y-axis for this pad
@@ -249,9 +306,7 @@ class PadHandler(object):
             font size in units of default font size (em)
 
         """
-        main_h = self.get_primitives([TH1F, TH2F]).next()
-        main_h.SetYTitle(self._ylabel)
-        main_h.GetYaxis().SetTitleSize( self._calc_size(size)  )
+        self._text_strategy.set_ylabel(self._ylabel, self._calc_size(size) )
 
     def _update_axes(self):
         """ rescale the axis labels for this pad
@@ -260,14 +315,10 @@ class PadHandler(object):
         values for different layout parameters
 
         """
-        main_h = self.get_primitives([TH1F, TH2F]).next()
-        size = self._calc_size(1)
-        main_h.GetXaxis().SetLabelSize(size)
-        main_h.GetYaxis().SetLabelSize(size)
-        main_h.GetYaxis().SetNdivisions( 500+int( 10*self._pad.GetHNDC() ) )
-        main_h.GetXaxis().SetTitleOffset( 1.2*self._pad.GetHNDC() )
-        main_h.GetYaxis().SetTitleOffset( 1.2*self._pad.GetHNDC() )
-        self._pad.Update()
+        ndiv   =  500+int( 10*self._pad.GetHNDC() )
+        size   = self._calc_size(1)
+        offset = 1.2*self._pad.GetHNDC()
+        self._text_strategy.set_axes( size, ndiv, offset )
 
     def get_primitives(self, with_type = None):
         """ yield primitives of given type reachable from this pad
