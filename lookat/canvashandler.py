@@ -565,9 +565,14 @@ class CanvasHandler(object):
             pos = (0.8, 0.8, 1, 1)
         this_legend = TLegend(pos[0], pos[1], pos[2], pos[3])
         this_legend.SetFillColor(0)
-        for i, h in enumerate(self._pads["main"].get_primitives(TH1F)):
+        types = [TH1F, TEfficiency, TGraph, TGraphAsymmErrors]
+        for i, h in enumerate(self._pads["main"].get_primitives(types)):
             this_legend.AddEntry(h, labels[i])
-            h.SetStats(False)
+            try:
+                h.SetStats(False)
+            except AttributeError:
+                # TEfficiency has no stats
+                pass
             if colors != None:
                 try:
                     h.SetLineColor(colors[i])
