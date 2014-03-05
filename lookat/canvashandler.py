@@ -582,8 +582,7 @@ class CanvasHandler(object):
         self._pads["main"].Update()
         if self._legend != None:
             self._legend.Delete()
-        else:
-            self._legend = this_legend
+        self._legend = this_legend
         return this_legend
 
     def SetLogy(self):
