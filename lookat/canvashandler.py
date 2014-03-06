@@ -575,6 +575,7 @@ class CanvasHandler(object):
                 pass
             if colors != None:
                 try:
+                    h.SetMarkerColor(colors[i])
                     h.SetLineColor(colors[i])
                 except IndexError:
                     pass
