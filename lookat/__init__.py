@@ -354,6 +354,8 @@ def add_file(name):
     """
     global gFiles
     gFiles.append( TFile( name ) )
+    if not gFiles[-1].IsOpen():
+        raise RuntimeError("failed to open file")
     print(name+" added to gFiles.")
     gWorkspace.cd()
     return gFiles[-1]
@@ -857,9 +859,12 @@ if __name__ == "__main__":
         print("use:\n  add_file( '<file>')\n  load( '<tree>' )")
         print("or:\n  create_chain( '<name>', [<files>] )\nto get started.")
     elif n_args == 2:
-
         add_file( sys.argv[1] )
+        load_cmd =  "add_file( '"+sys.argv[1]+"' )"
         print("use:\n  load( '<tree>' )\nto load a tree.\n")
         lstree()
     else:
-        create_chain( sys.argv[1], [f for f in sys.argv[2:]])
+        create_chain( sys.argv[1], sys.argv[2:] )
+        load_cmd =  "create_chain( '"+sys.argv[1]+"', "+str(sys.argv[2:])+" )"
+    get_ipython().history_manager.store_inputs(0, "from lookat import *; "+load_cmd)
+
