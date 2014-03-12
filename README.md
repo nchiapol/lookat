@@ -43,7 +43,7 @@ documentation from the terminal use
 Probably more useful is to access the documentation from within
 IPython, e.g.
 
-   >>> draw?
+    >>> draw?
 
 
 Installation
