@@ -729,7 +729,7 @@ def draw_ratio(h_num = None, h_denum = None, canv = None, normalised = True):
     old_pad.cd()
     return ratio
 
-def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
+def draw_weighted(var, h_weight, select="", h_cfg=None, inverse_weight=False, tree=None):
     """ create a 1D histogram for ''var'' corrected for an efficiency effect
 
     creates a histogram for ''var'' and weight each event with the inverse of
@@ -739,13 +739,15 @@ def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
     ----------
     var : string
         name of tree-branch to plot
-    h_eff : RatioTHnF
-        efficency histogram used to look up weights
+    h_weight : RatioTHnF
+        histogram used to look up weights
     select : string
         selection to appy (default: "")
+    inverse_weight : Boolean
+        if set to True, events will be weighted with 1/weight (default: False)
     h_cfg : string
         histogram configuration as used by TTree.Draw()
-        ( default: same as h_eff, if same variable
+        ( default: same as h_weight, if same variable
                    40 bins, auto range otherwise)
     tree : TTree
         tree to take events from (default: gTrees[-1])
@@ -759,8 +761,8 @@ def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
     if tree == None:
         tree = gTrees[-1]
     if h_cfg == None:
-        if h_eff.var_info == var:
-            h_cfg = h_eff.bin_edges_x
+        if h_weight.var_info == var:
+            h_cfg = h_weight.bin_edges_x
         else:
             h_cfg = ( 40, tree.GetMinimum(var), tree.GetMaximum(var) )
     name = _get_unique_hname("h_"+var+"_{0}")
@@ -768,10 +770,13 @@ def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
     h.var_info = var
     put_texts(xlabel=var)
     for evt in tree.CopyTree(select):
-        try:
-            h.Fill(evt.__getattr__(var), 1./h_eff.get_content(evt) )
-        except ZeroDivisionError:
-            print "Warning: event with 0 efficiency, skipping!"
+        if inverse_weight:
+            try:
+                h.Fill(evt.__getattr__(var), 1./h_weight.get_content(evt) )
+            except ZeroDivisionError:
+                print "Warning: event with 0 efficiency, skipping!"
+        else:
+            h.Fill(evt.__getattr__(var), h_weight.get_content(evt) )
     ### ensure canvas after the loop has finished
     cleanup()
     if len(gCanvs) == 0:
@@ -780,6 +785,14 @@ def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
     do = _prepare_drawopts(1)
     h.Draw(do)
     return h
+
+def draw_corrected(var, h_eff, select="", h_cfg=None, tree=None):
+    """ create a 1D histogram for ''var'' corrected for an efficiency effect
+
+    Wrapper around draw_weighted, with inverse_weight==True
+
+    """
+    return draw_weighted(var, h_eff, select=select, h_cfg=h_cfg, inverse_weight=True, tree=tree)
 
 def create_weight_string(histo):
     """ create a weight string based on passed histogram
