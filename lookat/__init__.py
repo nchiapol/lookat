@@ -678,7 +678,13 @@ def draw(var, select="", h_name="myHist_{0}", h_cfg=None, tree=None):
     else:
         h = gPad.GetPrimitive(name[1:])
     h.var_info = var
-    put_texts(xlabel=var)
+    texts = var.split(':')
+    if len(texts) == 1:
+        put_texts(xlabel=texts[0])
+    elif len(texts) == 2:
+        put_texts(xlabel=texts[1], ylabel=texts[0])
+    else:
+        put_texts(xlabel=var)
     return h
 
 def draw_ratio(h_num = None, h_denum = None, canv = None, normalised = True):
