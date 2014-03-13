@@ -853,6 +853,8 @@ atexit.register(exit_handler)
 if __name__ == "__main__":
     print
     import sys
+    ipy = get_ipython()
+    path_cmd = "path = '"+str(ipy.magic("pwd"))+"'"
     n_args = len(sys.argv)
     if n_args < 2:
         print("\nmissing command-line argument, no file loaded!")
@@ -860,11 +862,16 @@ if __name__ == "__main__":
         print("or:\n  create_chain( '<name>', [<files>] )\nto get started.")
     elif n_args == 2:
         add_file( sys.argv[1] )
-        load_cmd =  "add_file( '"+sys.argv[1]+"' )"
+        load_cmd =  "add_file( path+'"+sys.argv[1]+"' )"
         print("use:\n  load( '<tree>' )\nto load a tree.\n")
         lstree()
     else:
         create_chain( sys.argv[1], sys.argv[2:] )
-        load_cmd =  "create_chain( '"+sys.argv[1]+"', "+str(sys.argv[2:])+" )"
-    get_ipython().history_manager.store_inputs(0, "from lookat import *; "+load_cmd)
+
+        file_list = "["
+        for f in sys.argv[2:]:
+            file_list += "path+'"+f+"', "
+        file_list += "]"
+        load_cmd =  "create_chain( '"+sys.argv[1]+"', "+file_list+" )"
+    ipy.history_manager.store_inputs(0, "from lookat import *\n"+path_cmd+"\n"+load_cmd)
 
