@@ -812,7 +812,7 @@ def create_weight_string(histo):
 
     """
     output = "("
-    tmpl_str = "{weight:.3f}*({low:.2f} < {var} && {var} < {high:.2f})+"
+    tmpl_str = "{weight:.3f}*({low:.2f} <= {var} && {var} < {high:.2f})+"
     for i in range(1, histo.GetNbinsX()+1):
         output += tmpl_str.format(weight=histo.GetBinContent(i),
                                   low=histo.GetBinLowEdge(i),
