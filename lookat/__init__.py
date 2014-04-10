@@ -873,7 +873,7 @@ if __name__ == "__main__":
     print
     import sys
     ipy = get_ipython()
-    path_cmd = "path = '"+str(ipy.magic("pwd"))+"'"
+    path_cmd = "path = '"+str(ipy.magic("pwd"))+"/'"
     n_args = len(sys.argv)
     if n_args < 2:
         print("\nmissing command-line argument, no file loaded!")
