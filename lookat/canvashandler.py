@@ -11,8 +11,39 @@ License: GNU General Public License version 2,
 """
 from ROOT import TCanvas, TPad, TPaveText, TLegend
 from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphAsymmErrors
+from ROOT import kRed, kGreen, kBlue, kCyan, kMagenta
 
 em = 0.035
+
+def _colorGenerator(i = 0):
+    """ generator to create lists of useful root colors
+    
+    Parameters
+    ----------
+    i : int
+       initial value of internal position-counter
+
+    Returns
+    -------
+    color : int
+       next color from internal list (restarting if necessary)
+
+    
+    Examples
+    --------
+    >>> nextColor = _colorGenerator(1).next
+    >>> nextColor()  # kGreen = 416
+    416
+
+    >>> [nextColor() for _ in range(3)]  # kBlue = 600, kCyan = 432, kMagenta = 616
+    [600, 432, 616]
+
+    """
+    base_colors = [kRed, kGreen, kBlue, kCyan, kMagenta]
+    N = len(base_colors)
+    while True:
+        yield base_colors[i%N]
+        i+=1
 
 class TextStrategyDefault(object):
     def __init__(self, obj):
@@ -563,6 +594,9 @@ class CanvasHandler(object):
         """
         if pos == None:
             pos = (0.8, 0.8, 1, 1)
+        if colors == None:
+            nextColor = _colorGenerator().next
+            colors = [nextColor() for _ in range(len(labels))]
         this_legend = TLegend(pos[0], pos[1], pos[2], pos[3])
         this_legend.SetFillColor(0)
         types = [TH1F, TEfficiency, TGraph, TGraphAsymmErrors]
@@ -573,12 +607,11 @@ class CanvasHandler(object):
             except AttributeError:
                 # TEfficiency has no stats
                 pass
-            if colors != None:
-                try:
-                    h.SetMarkerColor(colors[i])
-                    h.SetLineColor(colors[i])
-                except IndexError:
-                    pass
+            try:
+                h.SetMarkerColor(colors[i])
+                h.SetLineColor(colors[i])
+            except IndexError:
+                pass
         this_legend.Draw()
         self._pads["main"].Update()
         if self._legend != None:
