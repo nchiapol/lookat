@@ -8,8 +8,7 @@ to run:
   3) run ''nosetests''
 
 """
-
-from nose.tools import assert_equal, assert_less
+from nose.tools import assert_equal, assert_less, assert_raises
 from lookat import *
 
 def test_globallists():
@@ -94,6 +93,27 @@ def test_cleanup():
     cleanup(True)
     assert_equal(len(gCanvs), 0)
     assert_equal(len(gHistos), 0)
+
+def test_badhistogram():
+    """ create a null-pointer histogram and clean it again """
+    # redirect the error message from ROOT to /dev/null
+    import os, sys
+    old_stderr = os.dup( sys.stderr.fileno() )
+    devnull    = file( "/dev/null", "w" )
+    os.dup2( devnull.fileno(), sys.stderr.fileno() )
+    # try to create histogram from in-existant variable
+    draw( "hello" )
+    # resotre file stderr
+    os.dup2( old_stderr, sys.stderr.fileno() )
+    devnull.close()
+    # check for new histogram and remove it
+    assert_equal(len(gHistos), 1)
+    cleanup(True)
+    assert_equal(len(gHistos), 0)
+    # clean up canvas created by draw
+    gCanvs[-1].Close()
+    gCanvs[-1]._canv = None
+    cleanup()
 
 def test_canvas():
     """ create a new canvas for the next tests """

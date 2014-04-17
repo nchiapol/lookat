@@ -326,9 +326,13 @@ def cleanup(include_histos = False):
                 for h in gHistos:
                     # check if histogram is linked with this canvas
                     # and remove it from ''orphaned'' if it is
-                    print("trying "+h.GetName())
-                    if pad.has_primitive( h.GetName() ):
-                        orphaned.remove(h)
+                    try:
+                        print("trying "+h.GetName())
+                        if pad.has_primitive( h.GetName() ):
+                            orphaned.remove(h)
+                    except ReferenceError:
+                        # probably a histogram created by a failed draw
+                        continue
         for h in orphaned:
             gHistos.remove(h)
             try:
