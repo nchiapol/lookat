@@ -11,6 +11,7 @@ License: GNU General Public License version 2,
 """
 from ROOT import TCanvas, TPad, TPaveText, TLegend
 from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphAsymmErrors
+from ROOT import TMultiGraph
 from ROOT import kRed, kGreen, kBlue, kCyan, kMagenta
 
 em = 0.035
@@ -45,17 +46,30 @@ def _colorGenerator(i = 0):
         yield base_colors[i%N]
         i+=1
 
+
+def _expand_multigraphs(in_list):
+    while True:
+        try:
+            idx = map(type, in_list).index(TMultiGraph)
+        except ValueError:
+            break
+        mg = in_list.pop(idx)
+        for g in mg.GetListOfGraphs():
+            in_list.insert(idx, g)
+            idx += 1
+
+_ts_default = [TH1F, TH2F, TGraph, TGraphAsymmErrors]
 class TextStrategyDefault(object):
     def __init__(self, obj):
-        if type(obj) not in [TH1F, TH2F, TGraph, TGraphAsymmErrors]:
+        if type(obj) not in _ts_default:
             raise TypeError("bad type passed")
-        self._obj = obj
-        self._x   = obj.GetXaxis()
-        self._y   = obj.GetYaxis()
+        self._title = obj
+        self._x     = obj.GetXaxis()
+        self._y     = obj.GetYaxis()
 
     def set_title(self, title):
         """ update the title """
-        self._obj.SetTitle(title)
+        self._title.SetTitle(title)
 
     def set_xlabel(self, xlabel, size):
         """ update the label on the x-axis """
@@ -79,13 +93,25 @@ class TextStrategyDefault(object):
         """ change the axis range """
         self._y.SetRangeUser(y_min, y_max)
 
+_ts_efficiency = [TEfficiency]
 class TextStrategyEfficiency(TextStrategyDefault):
     def __init__(self, obj):
-        if type(obj) not in [TEfficiency]:
+        if type(obj) not in _ts_efficiency:
             raise TypeError("no TEfficiency object passed")
-        self._obj = obj
-        self._x   = obj.GetPaintedGraph().GetXaxis()
-        self._y   = obj.GetPaintedGraph().GetYaxis()
+        self._title = obj
+        self._x     = obj.GetPaintedGraph().GetXaxis()
+        self._y     = obj.GetPaintedGraph().GetYaxis()
+
+_ts_multigraph = [TMultiGraph]
+class TextStrategyMultiGraph(TextStrategyDefault):
+    def __init__(self, obj):
+        if type(obj) not in _ts_multigraph:
+            raise TypeError("no TEfficiency object passed")
+        self._title = obj.GetHistogram()
+        self._x     = obj.GetXaxis()
+        self._y     = obj.GetYaxis()
+
+_ts_types = _ts_default+_ts_efficiency+_ts_multigraph
 
 
 class PadHandler(object):
@@ -163,10 +189,11 @@ class PadHandler(object):
         StopIteration error, if no suitable object is found
 
         """
-        types = [TH1F, TH2F, TEfficiency, TGraph, TGraphAsymmErrors]
-        text_obj = self.get_primitives(types).next()
+        text_obj = self.get_primitives(_ts_types).next()
         if type(text_obj) == TEfficiency:
             self._text_strategy = TextStrategyEfficiency(text_obj)
+        elif type(text_obj) == TMultiGraph:
+            self._text_strategy = TextStrategyMultiGraph(text_obj)
         else:
             self._text_strategy = TextStrategyDefault(text_obj)
 
@@ -248,6 +275,7 @@ class PadHandler(object):
         try:
             self.set_text_strategy()
         except StopIteration:
+            print "No suitable TextStrategy found"
             return
         self._text_strategy.set_yrange(y_min, y_max)
         self._pad.Update()
@@ -568,7 +596,6 @@ class CanvasHandler(object):
         """
         return self._legend
 
-
     def add_legend(self, labels, colors=None, pos=None):
         """ create a legend for this canvas
 
@@ -599,8 +626,9 @@ class CanvasHandler(object):
             colors = [nextColor() for _ in range(len(labels))]
         this_legend = TLegend(pos[0], pos[1], pos[2], pos[3])
         this_legend.SetFillColor(0)
-        types = [TH1F, TEfficiency, TGraph, TGraphAsymmErrors]
-        for i, h in enumerate(self._pads["main"].get_primitives(types)):
+        primitives = [p for p in self._pads["main"].get_primitives(_ts_types)]
+        _expand_multigraphs(primitives)
+        for i, h in enumerate(primitives):
             this_legend.AddEntry(h, labels[i])
             try:
                 h.SetStats(False)
