@@ -488,12 +488,12 @@ def th1f(h_name, binning):
     gHistos[-1].Sumw2()
     return gHistos[-1]
 
-def sel(var, low, high):
+def sel(var, low, high, prefix=""):
     """ create selection string for var in range (low, high)
 
-    returns the selection string "low < var && var < high", low and high will
-    have a precision of 2 decimal places, such that the string can be used as
-    title too.
+    returns the selection string prefix+"(low < var && var < high)", low and 
+    high willhave a precision of 2 decimal places, such that the string can 
+    be used as title too.
 
     Parameters
     ----------
@@ -503,6 +503,8 @@ def sel(var, low, high):
         lower edge of selection range
     high : float
         higher edge of selection range
+    prefix : string
+        prefix for the string (e.g. &&)
 
     Returns
     -------
@@ -510,7 +512,17 @@ def sel(var, low, high):
         selection string
 
     """
-    return "{1:.2f} < {0:s} && {0:s} < {2:.2f}".format(var, low, high)
+    return prefix+"({1:.2f} < {0:s} && {0:s} < {2:.2f})".format(var, low, high)
+
+def asel(var, low, high):
+    """ create additional selection string vor var in range (low, high)
+
+    uses sel() with the prefix set to "&&"
+
+    documentation for sel():
+    """
+    return sel(var, low, high, "&&")
+asel.__doc__ += "---\n"+sel.__doc__+"---"
 
 def normalise():
     """ normalise histograms on active canvas
