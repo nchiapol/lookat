@@ -8,30 +8,30 @@ to run:
   3) run ''nosetests''
 
 """
-from nose.tools import assert_equal, assert_less, assert_raises
+from nose.tools import assert_equal, assert_less, assert_raises, assert_is_instance
 from lookat import *
 
 def test_globallists():
-    assert_equal(type(gFiles), list)
+    assert_is_instance(gFiles, list)
     assert_equal( len(gFiles), 0)
-    assert_equal(type(gTrees), list)
+    assert_is_instance(gTrees, list)
     assert_equal( len(gTrees), 0)
-    assert_equal(type(gCanvs), list)
+    assert_is_instance(gCanvs, list)
     assert_equal( len(gCanvs), 0)
-    assert_equal(type(gHistos), list)
+    assert_is_instance(gHistos, list)
     assert_equal( len(gHistos), 0)
 
 def test_addfile():
     """ add the file with test data """
     add_file('test_input.root')
     assert_equal(len(gFiles), 1)
-    assert_equal(type(gFiles[-1]), TFile)
+    assert_is_instance(gFiles[-1], TFile)
 
 def test_load():
     """ load the tree in the file """
     load('advanced_tree')
     assert_equal(len(gTrees), 1)
-    assert_equal(type(gTrees[-1]), TTree)
+    assert_is_instance(gTrees[-1], TTree)
     assert_equal(gTrees[-1].GetName(), "advanced_tree")
 
 def test_createchain():
@@ -39,7 +39,7 @@ def test_createchain():
     create_chain('simple_tree', ['test_input.root'])
     assert_equal(len(gFiles), 1)
     assert_equal(len(gTrees), 2)
-    assert_equal(type(gTrees[-1]), TChain)
+    assert_is_instance(gTrees[-1], TChain)
     assert_equal(gTrees[-1].GetName(), "simple_tree")
 
 def test_getbranchlist():
@@ -67,7 +67,7 @@ def test_draw():
 
 def test_drawratio():
     draw_ratio()
-    assert_equal(type(gHistos[-1]), RatioTHnF)
+    assert_is_instance(gHistos[-1], RatioTHnF)
     assert_equal(gHistos[-1]._ratio.GetBinContent(1), 2.0)
     assert_equal(gHistos[-1]._ratio.GetBinContent(5), 2.0)
     assert_equal(gHistos[-1]._ratio.GetBinContent(6), 0.0)
@@ -172,7 +172,7 @@ def test_legend():
     """ add a legend; change line color of last histogram to red """
     from ROOT import TLegend
     l = legend( ["my gauss"], [kRed] )
-    assert_equal(type(l), TLegend)
+    assert_is_instance(l, TLegend)
     assert_equal(l, get_legend())
     assert_equal(gHistos[-1].GetLineColor(), kRed)
 
