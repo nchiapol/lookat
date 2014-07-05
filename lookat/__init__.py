@@ -15,6 +15,8 @@ Several global lists provide access to previously created objects.
 """
 
 import atexit
+import readline
+completer = readline.get_completer()
 from lookat.canvashandler import CanvasHandler
 from ROOT import TFile, TChain, TTree
 from ROOT import TH1F, TH2F
@@ -28,6 +30,7 @@ try:
 except ImportError:
     pass
 from math import log, exp, sqrt
+readline.set_completer(completer)
 
 gCanvs  = []
 gFiles  = []
