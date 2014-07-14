@@ -10,7 +10,7 @@ License: GNU General Public License version 2,
 
 """
 from ROOT import TCanvas, TPad, TPaveText, TLegend
-from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphAsymmErrors
+from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphErrors, TGraphAsymmErrors
 from ROOT import TMultiGraph
 from ROOT import kRed, kGreen, kBlue, kCyan, kMagenta
 
@@ -58,7 +58,7 @@ def _expand_multigraphs(in_list):
             in_list.insert(idx, g)
             idx += 1
 
-_ts_default = [TH1F, TH2F, TGraph, TGraphAsymmErrors]
+_ts_default = [TH1F, TH2F, TGraph, TGraphErrors, TGraphAsymmErrors]
 class TextStrategyDefault(object):
     def __init__(self, obj):
         if type(obj) not in _ts_default:
