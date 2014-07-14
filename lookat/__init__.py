@@ -894,6 +894,7 @@ if __name__ == "__main__":
     ipy = get_ipython()
     path_cmd = "path = '"+str(ipy.magic("pwd"))+"/'"
     n_args = len(sys.argv)
+    load_cmd = False
     if n_args < 2:
         print("\nmissing command-line argument, no file loaded!")
         print("use:\n  add_file( '<file>')\n  load( '<tree>' )")
@@ -911,5 +912,6 @@ if __name__ == "__main__":
             file_list += "path+'"+f+"', "
         file_list += "]"
         load_cmd =  "create_chain( '"+sys.argv[1]+"', "+file_list+" )"
-    ipy.history_manager.store_inputs(0, "from lookat import *\n"+path_cmd+"\n"+load_cmd)
+    if load_cmd != False:
+        ipy.history_manager.store_inputs(0, "from lookat import *\n"+path_cmd+"\n"+load_cmd)
 
