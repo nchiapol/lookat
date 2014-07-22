@@ -231,7 +231,7 @@ class RatioTHnF(object):
         return edges
 
     @property
-    def ratio_thnf(self):
+    def thnf(self):
         """ get the TH1F/TH2F object for the ratio """
         return self._ratio
 
