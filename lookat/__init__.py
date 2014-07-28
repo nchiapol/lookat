@@ -90,8 +90,7 @@ class RatioTHnF(object):
         self._denum      = h_denum
         self._normalised = normalised
         res_name = _get_unique_hname("ratio_{0}")
-        self._ratio = self._num.Clone()
-        self._ratio.SetName(res_name)
+        self._ratio = self._num.Clone(res_name)
         try:
             self._ratio.var_info = self._num.var_info
         except AttributeError:
