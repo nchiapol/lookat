@@ -73,7 +73,7 @@ def test_drawratio():
     assert_equal(gHistos[-1]._ratio.GetBinContent(6), 0.0)
 
 def test_createweightstring():
-    w_str = create_weight_string(gHistos[-1].ratio_thnf)
+    w_str = create_weight_string(gHistos[-1].thnf)
     assert_equal(w_str, "(2.000*(0.00 <= double_leaf*5 && double_leaf*5 < 1.00)+2.000*(1.00 <= double_leaf*5 && double_leaf*5 < 2.00)+2.000*(2.00 <= double_leaf*5 && double_leaf*5 < 3.00)+2.000*(3.00 <= double_leaf*5 && double_leaf*5 < 4.00)+2.000*(4.00 <= double_leaf*5 && double_leaf*5 < 5.00)+0.000*(5.00 <= double_leaf*5 && double_leaf*5 < 6.00)+0.000*(6.00 <= double_leaf*5 && double_leaf*5 < 7.00)+0.000*(7.00 <= double_leaf*5 && double_leaf*5 < 8.00)+0.000*(8.00 <= double_leaf*5 && double_leaf*5 < 9.00)+0.000*(9.00 <= double_leaf*5 && double_leaf*5 < 10.00)+0.000*(10.00 <= double_leaf*5 && double_leaf*5 < 11.00))")
 
 def test_cleanup():
