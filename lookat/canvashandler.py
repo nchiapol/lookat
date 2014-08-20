@@ -12,17 +12,19 @@ License: GNU General Public License version 2,
 from ROOT import TCanvas, TPad, TPaveText, TLegend
 from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphErrors, TGraphAsymmErrors
 from ROOT import TMultiGraph
-from ROOT import kRed, kGreen, kBlue, kCyan, kMagenta
+from ROOT import kRed, kOrange, kSpring, kGreen, kCyan, kAzure, kBlue, kViolet, kMagenta
 
 em = 0.035
 
-def _colorGenerator(i = 0):
+def _colorGenerator(i = 0, num=0):
     """ generator to create lists of useful root colors
     
     Parameters
     ----------
     i : int
        initial value of internal position-counter
+    num : int
+       expected number of colors needed
 
     Returns
     -------
@@ -32,7 +34,7 @@ def _colorGenerator(i = 0):
     
     Examples
     --------
-    >>> nextColor = _colorGenerator(1).next
+    >>> nextColor = _colorGenerator(1, 4).next
     >>> nextColor()  # kGreen = 416
     416
 
@@ -40,7 +42,10 @@ def _colorGenerator(i = 0):
     [600, 432, 616]
 
     """
-    base_colors = [kRed, kGreen, kBlue, kCyan, kMagenta]
+    if 0 < num and num < 6:
+        base_colors = [kRed, kGreen, kBlue, kCyan, kMagenta]
+    else:
+        base_colors = [kRed, kOrange+7, kSpring+4, kGreen, kCyan, kAzure+7, kBlue, kViolet+2, kMagenta]
     N = len(base_colors)
     while True:
         yield base_colors[i%N]
@@ -622,7 +627,7 @@ class CanvasHandler(object):
         if pos == None:
             pos = (0.8, 0.8, 1, 1)
         if colors == None:
-            nextColor = _colorGenerator().next
+            nextColor = _colorGenerator(num=len(labels)).next
             colors = [nextColor() for _ in range(len(labels))]
         this_legend = TLegend(pos[0], pos[1], pos[2], pos[3])
         this_legend.SetFillColor(0)
