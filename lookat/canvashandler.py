@@ -14,7 +14,7 @@ from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphErrors, TGraphAsymmError
 from ROOT import TMultiGraph
 from ROOT import kRed, kOrange, kSpring, kGreen, kCyan, kAzure, kBlue, kViolet, kMagenta
 
-em = 0.035
+em = 0.045
 
 def _colorGenerator(i = 0, num=0):
     """ generator to create lists of useful root colors
@@ -146,6 +146,7 @@ class PadHandler(object):
         self._text_strategy = None
 
         self._pad = TPad(name, name, dim[0], dim[1], dim[2], dim[3], 4000)
+        self._update_margins()
         self._pad.Draw()
 
     def cd(self):
@@ -227,10 +228,7 @@ class PadHandler(object):
         """
         self.cd()
         self._pad.SetPad(0, 0, 1, 1)
-        self._pad.SetTopMargin(0.1)
-        self._pad.SetRightMargin(0.1)
-        self._pad.SetBottomMargin(0.1)
-        self._pad.SetLeftMargin(0.1)
+        self._update_margins()
         self.Update()
 
     def hide_pad(self):
@@ -379,7 +377,20 @@ class PadHandler(object):
         ndiv   =  500+int( 10*self._pad.GetHNDC() )
         size   = self._calc_size(1)
         offset = 1.2*self._pad.GetHNDC()
+        self._update_margins()
         self._text_strategy.set_axes( size, ndiv, offset )
+
+    def _update_margins(self):
+        """ adjust the margins for this pad
+
+        updates the margins to reasonable sizes for the choosen fontsize
+
+        """
+        size = 0.09*em/0.035
+        self._pad.SetTopMargin(0.3*size)
+        self._pad.SetRightMargin(0.8*size)
+        self._pad.SetBottomMargin(size)
+        self._pad.SetLeftMargin(size)
 
     def get_primitives(self, with_type = None):
         """ yield primitives of given type reachable from this pad
@@ -452,7 +463,7 @@ class CanvasHandler(object):
         self._pads     = {}
         self._text_pad = "main"
         self._texts    = {'title': "", 'xlabel': "", 'ylabel': ""}
-        self._em       = 0.035  # factor for default of text size
+        #self._em       = 0.035  # factor for default of text size
         self._legend   = None
 
         if name != "":
