@@ -244,16 +244,13 @@ class PadHandler(object):
     def _calc_size(self, size):
         """ calculate the size value (in Root fractions)
 
-        Calculates the fraction-size needed to get a given font size on a
-        selected pad.
+        Calculates the fraction-size needed to get a given font size 
+        on a this pad.
 
         Parameters
         ----------
         size : float
             font size in units of default font size (em)
-        pad : TPad or string
-            pad to calculate fraction-size for
-            (a string is interpreted as a key in the _pads-dict)
 
         Returns
         -------
