@@ -14,7 +14,7 @@ from ROOT import TH1F, TH2F, TEfficiency, TGraph, TGraphErrors, TGraphAsymmError
 from ROOT import TMultiGraph
 from ROOT import kRed, kOrange, kSpring, kGreen, kCyan, kAzure, kBlue, kViolet, kMagenta
 
-em = 0.045
+em         = 0.050
 
 def _colorGenerator(i = 0, num=0):
     """ generator to create lists of useful root colors
