@@ -630,7 +630,7 @@ def _prepare_drawopts(n_dim = 1):
             draw_opts = "Ep"
     return draw_opts
 
-def draw(var, select="", h_name="myHist_{0}", h_cfg=None, tree=None):
+def draw(var, select="", h_name="myHist_{0}", h_cfg=None, tree=None, draw_opts=None):
     """ create a histogram for given variable ''var''
 
     Creates a canvas if non exists. If this will be the first histogram on the
@@ -656,6 +656,8 @@ def draw(var, select="", h_name="myHist_{0}", h_cfg=None, tree=None):
         only a few distinct values.)
     tree : TTree
         tree to take events from (default: gTrees[-1])
+    draw_opts : string
+        draw option passed on to draw command, leave None to get smart choice
 
     Returns
     -------
@@ -685,17 +687,18 @@ def draw(var, select="", h_name="myHist_{0}", h_cfg=None, tree=None):
     if h_name.find('{0}') != -1:
         name = _get_unique_hname(h_name)
     ### prepare draw option
-    draw_opts = _prepare_drawopts(n_dim)
+    if draw_opts==None:
+        draw_opts = _prepare_drawopts(n_dim)
     ### draw
     if tree == None:
         tree = gTrees[-1]
     tree.Draw(var+'>>'+name+h_cfg, select, draw_opts)
     ### store histogram
     if name[0] != "+":
-        h = gPad.GetPrimitive(name)
+        h = gDirectory.Get(name)
         gHistos.append(h)
     else:
-        h = gPad.GetPrimitive(name[1:])
+        h = gDirectory.Get(name[1:])
     h.var_info = var
     h.SetMarkerStyle(20)
     texts = var.split(':')
