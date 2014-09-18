@@ -187,6 +187,11 @@ class PadHandler(object):
         """
         self._pad.SetGrid()
 
+    @property
+    def text_obj(self):
+        """ get the object whose texts are displayed """
+        return self.get_primitives(_ts_types).next()
+
     def set_text_strategy(self):
         """ set the text strategy
 
@@ -195,7 +200,7 @@ class PadHandler(object):
         StopIteration error, if no suitable object is found
 
         """
-        text_obj = self.get_primitives(_ts_types).next()
+        text_obj = self.text_obj
         if type(text_obj) == TEfficiency:
             self._text_strategy = TextStrategyEfficiency(text_obj)
         elif type(text_obj) == TMultiGraph:
