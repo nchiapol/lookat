@@ -694,6 +694,24 @@ class CanvasHandler(object):
         """
         self._pads["main"].SetLogy()
 
+    def set_yrange(self, y_min, y_max, pad="main"):
+        """ set the y-range of a pad from this canvas
+
+        Updates the y-axis of the main histogram on the
+        selected pad with the given y-range.
+
+        Parameters
+        ----------
+        y_min : float
+            min value for the y axis
+        y_max : float
+            max value for the y axis
+        pad : string
+            name of the pad to adjust
+
+        """
+        self.pads[pad].set_yrange(y_min, y_max)
+
     def GetName(self):
         """ get the name of the canvas from this handler
 
