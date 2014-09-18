@@ -86,13 +86,13 @@ class TextStrategyDefault(object):
         self._y.SetTitle(ylabel)
         self._y.SetTitleSize( size )
 
-    def set_axes(self, size, ndiv, offset):
+    def set_axes(self, size, ndiv_y, offset_y):
         """ rescale the axis labels """
         self._x.SetLabelSize(size)
         self._y.SetLabelSize(size)
-        self._y.SetNdivisions( ndiv )
-        self._x.SetTitleOffset( offset )
-        self._y.SetTitleOffset( offset )
+        self._y.SetNdivisions( ndiv_y )
+        self._x.SetTitleOffset( 1.2 )
+        self._y.SetTitleOffset( offset_y )
 
     def set_yrange(self, y_min, y_max):
         """ change the axis range """
@@ -379,11 +379,11 @@ class PadHandler(object):
         values for different layout parameters
 
         """
-        ndiv   =  500+int( 10*self._pad.GetHNDC() )
+        ndiv_y   =  500+int( 10*self._pad.GetHNDC() )
         size   = self._calc_size(1)
-        offset = 1.2*self._pad.GetHNDC()
+        offset_y = 1.2*self._pad.GetHNDC()
         self._update_margins()
-        self._text_strategy.set_axes( size, ndiv, offset )
+        self._text_strategy.set_axes( size, ndiv_y, offset_y )
 
     def _update_margins(self):
         """ adjust the margins for this pad
