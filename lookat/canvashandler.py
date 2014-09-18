@@ -146,6 +146,7 @@ class PadHandler(object):
         self._text_strategy = None
 
         self._pad = TPad(name, name, dim[0], dim[1], dim[2], dim[3], 4000)
+        self._margins = {"top" : "auto", "right" : "auto", "bottom" : "auto", "left" : "auto"}
         self._update_margins()
         self._pad.Draw()
 
@@ -391,10 +392,32 @@ class PadHandler(object):
         updates the margins to reasonable sizes for the choosen fontsize
 
         """
-        size = 0.09*em/0.035
-        self._pad.SetTopMargin(0.3*size)
-        self._pad.SetRightMargin(0.8*size)
+        ref = 0.035  # 0.035: default em, siutable for margins
+        if self._margins["top"] == "auto":
+            if self._title == "":
+                size = 0.03
+            else:
+                size = 0.1
+        else:
+            size = self._margins["top"]
+        self._pad.SetTopMargin(size)
+        if self._margins["right"] == "auto":
+            size = 0.08
+        else:
+            size = self._margins["right"]
+        self._pad.SetRightMargin(size)
+        if self._margins["bottom"] == "auto":
+            size = 0.1
+            if (self._xlabel == ""):
+                size = 0.04
+            size = self._calc_size(size)/ref
+        else:
+            size = self._margins["bottom"]
         self._pad.SetBottomMargin(size)
+        if self._margins["left"] == "auto":
+            size = 0.1*em/ref
+        else:
+            size = self._margins["left"]
         self._pad.SetLeftMargin(size)
 
     def get_primitives(self, with_type = None):
