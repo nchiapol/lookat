@@ -186,6 +186,7 @@ class RatioTHnF(object):
 
         """
         self._ratio.SetLineColor( self._num.GetLineColor() )
+        self._ratio.SetMarkerColor( self._num.GetMarkerColor() )
 
     def GetName(self):
         """ get the name of the ratio THnF
@@ -696,6 +697,7 @@ def draw(var, select="", h_name="myHist_{0}", h_cfg=None, tree=None):
     else:
         h = gPad.GetPrimitive(name[1:])
     h.var_info = var
+    h.SetMarkerStyle(20)
     texts = var.split(':')
     if len(texts) == 1:
         put_texts(xlabel=texts[0])
